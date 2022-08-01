@@ -9,5 +9,4 @@ exports.fetchArticle = ({article_id}) => {
         }
         return rows[0]
     })
-    .catch((err) => Promise.reject(err))
 }

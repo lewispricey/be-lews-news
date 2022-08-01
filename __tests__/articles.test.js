@@ -52,13 +52,10 @@ describe("/api/articles/:article_id", () => {
             .get('/api/articles/100')
             .expect(404)
         })
-        test.only("STATUS:400 when passed an articleID of the wrong data type", () => {
+        test("STATUS:400 when passed an articleID of the wrong data type", () => {
             return request(app)
             .get('/api/articles/banana')
             .expect(400)
-            .then(({body}) => {
-                console.log(body.msg)
-            })
         })
     })
 })
