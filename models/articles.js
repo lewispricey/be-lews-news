@@ -10,3 +10,13 @@ exports.fetchArticle = ({article_id}) => {
         return rows[0]
     })
 }
+
+exports.updateArticle = ({article_id}, body) => {
+    if(!body.inc_votes){
+        return({status: 400, msg: "invalid request"})
+    }
+
+    return db
+    .query('UPDATE articles SET votes=votes+$1 WHERE article_id=$2 RETURNING*;', [body.inc_votes, article_id])
+    .then(({rows}) => rows[0])
+}

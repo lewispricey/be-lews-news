@@ -58,4 +58,41 @@ describe("/api/articles/:article_id", () => {
             .expect(400)
         })
     })
+    describe("PATCH", () => {
+        test("STATUS: 200 - responds with the updated article, votes increased when passed positive value", () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send({inc_votes: 1})
+            .set('Accept', 'application/json')
+            .expect(200)
+            .then(({body}) => {
+                expect(body.votes).toBe(101)
+            })
+        })
+        test("STATUS: 200 - responds with the updated article, votes decreased when passed negative value", () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send({inc_votes: -1})
+            .set('Accept', 'application/json')
+            .expect(200)
+            .then(({body}) => {
+                expect(body.votes).toBe(100)
+            })
+        })
+        test("status: 400 - when not passed a inc_votes body", () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send()
+            .set('Accept', 'application/json')
+            .expect(400)
+        })
+        test("status: 404 - when passed an invalid inc_votes charactor", () => {
+            return request(app)
+            .patch('/api/articles/1')
+            .send({inc_votes: "cat"})
+            .set('Accept', 'application/json')
+            .expect(400)
+        })
+    })
 })
+
