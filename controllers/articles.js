@@ -1,4 +1,5 @@
-const { fetchArticle, updateArticle } = require("../models/articles")
+const articles = require("../db/data/test-data/articles")
+const { fetchArticle, updateArticle, fetchArticles } = require("../models/articles")
 
 
 exports.getArticle = (req, res, next) => {
@@ -11,4 +12,10 @@ exports.patchArticle = (req, res, next) => {
     updateArticle(req.params, req.body)
     .then((updatedArticle) => res.status(200).send(updatedArticle))
     .catch((err) => next(err))
+}
+
+exports.getArticles = (req, res, next) => {
+    console.log("controller")
+    fetchArticles()
+    .then((articles) => res.status(200).send({articles}))
 }

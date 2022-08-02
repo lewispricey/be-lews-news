@@ -1,3 +1,4 @@
+const e = require("express")
 const db = require("../db/connection")
 
 exports.fetchArticle = ({article_id}) => {
@@ -24,5 +25,20 @@ exports.updateArticle = ({article_id}, body) => {
             return Promise.reject({status: 404, msg: "Requested ID not found"})
         }
         return article
+    })
+}
+
+exports.fetchArticles = () => {
+    console.log("model")
+    return db
+    .query(`
+        SELECT articles.article_id, title, topic, articles.author, articles.body, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
+        FROM articles 
+        LEFT OUTER JOIN comments ON articles.article_id = comments.article_id 
+        GROUP BY articles.article_id 
+        ORDER BY articles.created_at DESC;`)
+    .then(({rows}) => {
+        console.log(rows)
+        return rows
     })
 }
