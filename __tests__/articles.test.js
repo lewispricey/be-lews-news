@@ -120,7 +120,6 @@ describe("/api/articles", () => {
                 expect(article.hasOwnProperty("title")).toBe(true)
                 expect(article.hasOwnProperty("topic")).toBe(true)
                 expect(article.hasOwnProperty("author")).toBe(true)
-                expect(article.hasOwnProperty("body")).toBe(true)
                 expect(article.hasOwnProperty("created_at")).toBe(true)
                 expect(article.hasOwnProperty("comment_count")).toBe(true)
             })
