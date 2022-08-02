@@ -3,6 +3,7 @@ const app = require("../app.js");
 const seedDB = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
+const e = require("express");
 
 beforeAll(() => seedDB(data))
 afterAll(() => db.end())
@@ -104,3 +105,30 @@ describe("/api/articles/:article_id", () => {
     })
 })
 
+describe("/api/articles", () => {
+    describe("GET", () => {
+        test("Status 200 - returns the correct number of article objects", async () => {
+            const output = await request(app).get('/api/articles')
+            expect(output.status).toBe(200)
+            expect(output.body.articles.length).toBe(12)
+        })
+        test("Status 200 - return objects contain the expected propertys", async () => {
+            const output = await request(app).get('/api/articles')
+            const rtnArticles = output.body.articles
+            rtnArticles.forEach((article) => {
+                expect(article.hasOwnProperty("article_id")).toBe(true)
+                expect(article.hasOwnProperty("title")).toBe(true)
+                expect(article.hasOwnProperty("topic")).toBe(true)
+                expect(article.hasOwnProperty("author")).toBe(true)
+                expect(article.hasOwnProperty("created_at")).toBe(true)
+                expect(article.hasOwnProperty("comment_count")).toBe(true)
+            })
+        })
+        test("Status 200 - return objects are sorted by newest date first", async () => {
+            const output = await request(app).get('/api/articles')
+            const rtnArticles = output.body.articles
+            const idOrder = rtnArticles.map((article) => article.article_id)
+            expect(idOrder).toEqual([3, 6,  2, 12, 5, 1, 9, 10, 4, 8, 11, 7])
+        })
+    })
+})

@@ -1,3 +1,4 @@
+const e = require("express")
 const db = require("../db/connection")
 
 exports.fetchArticle = ({article_id}) => {
@@ -25,4 +26,15 @@ exports.updateArticle = ({article_id}, body) => {
         }
         return article
     })
+}
+
+exports.fetchArticles = () => {
+    return db
+    .query(`
+        SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
+        FROM articles 
+        LEFT OUTER JOIN comments ON articles.article_id = comments.article_id 
+        GROUP BY articles.article_id 
+        ORDER BY articles.created_at DESC;`)
+    .then(({rows}) => rows)
 }
