@@ -12,11 +12,14 @@ exports.fetchArticle = ({article_id}) => {
 }
 
 exports.updateArticle = ({article_id}, body) => {
-    if(!body.inc_votes){
-        return({status: 400, msg: "invalid request"})
-    }
-
+    if(!body.inc_votes) return({status: 400, msg: "invalid arguement in request"})
     return db
     .query('UPDATE articles SET votes=votes+$1 WHERE article_id=$2 RETURNING*;', [body.inc_votes, article_id])
-    .then(({rows}) => rows[0])
+    .then(({rows}) => {
+        const article = rows[0]
+        if(!article){
+            return Promise.reject({status: 404, msg: "Requested ID not found"})
+        }
+        return article
+    })
 }

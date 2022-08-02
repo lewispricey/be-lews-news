@@ -11,15 +11,14 @@ app.get('/api/topics', getTopics)
 app.get('/api/articles/:article_id', getArticle)
 app.patch('/api/articles/:article_id', patchArticle)
 
-app.use((err, req, res, next) => {
-    if(err.status){
-        res.status(err.status).send({msg: err.msg})
-    }
-    next(err)
-})
+//////////////////////////////////////////
 
 app.use((err, req, res, next) => {
-    res.status(400).send({msg: err})
+    if(err.status) res.status(err.status).send({msg: err.msg})
+    next(err)
+})
+app.use((err, req, res, next) => {
+    res.status(400).send({msg: "invalid data type"})
 })
 
 module.exports = app

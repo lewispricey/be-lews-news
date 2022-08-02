@@ -93,6 +93,13 @@ describe("/api/articles/:article_id", () => {
             .set('Accept', 'application/json')
             .expect(400)
         })
+        test("status: 404 - when passed an article_id that does not exist", () => {
+            return request(app)
+            .patch('/api/articles/100')
+            .send({inc_votes: 1})
+            .set('Accept', 'application/json')
+            .expect(404)
+        })
     })
 })
 
