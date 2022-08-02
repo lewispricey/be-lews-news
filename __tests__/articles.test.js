@@ -28,6 +28,7 @@ describe("/api/articles/:article_id", () => {
                 expect(body.hasOwnProperty("body")).toBe(true)
                 expect(body.hasOwnProperty("topic")).toBe(true)
                 expect(body.hasOwnProperty("votes")).toBe(true)
+                expect(body.hasOwnProperty("comment_count")).toBe(true)
             })
         })
         test("STATUS:200 returns the expected values when given 1 as the parameter", () => {
@@ -39,14 +40,26 @@ describe("/api/articles/:article_id", () => {
                 body: 'I find this existence challenging',
                 created_at: "2020-07-09T20:11:00.000Z",
                 votes: 100
+
             }
             
             return request(app)
             .get('/api/articles/1')
             .then(({body}) => {
-                expect(body).toEqual(expectedOutput)
+                expect(body.article_id).toEqual(expectedOutput.article_id)
+                expect(body.title).toEqual(expectedOutput.title)
+                expect(body.topic).toEqual(expectedOutput.topic)
+                expect(body.author).toEqual(expectedOutput.author)
+                expect(body.body).toEqual(expectedOutput.body)
+                expect(body.created_at).toEqual(expectedOutput.created_at)
+                expect(body.votes).toEqual(expectedOutput.votes)
             })
         })
+        test("STATUS:200 return the correct comment count", async () => {
+            const {body} = await request(app).get('/api/articles/1')
+            expect(body.comment_count).toBe("11")
+        })
+
         test("STATUS:404 when passed an articleID that does not exist in DB", () => {
             return request(app)
             .get('/api/articles/100')
