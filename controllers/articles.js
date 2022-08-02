@@ -15,7 +15,7 @@ exports.patchArticle = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    console.log("controller")
     fetchArticles()
     .then((articles) => res.status(200).send({articles}))
+    .catch((err) => next(err))
 }
