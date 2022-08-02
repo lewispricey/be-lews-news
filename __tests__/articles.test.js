@@ -60,45 +60,68 @@ describe("/api/articles/:article_id", () => {
     })
     describe("PATCH", () => {
         test("STATUS: 200 - responds with the updated article, votes increased when passed positive value", () => {
+            const expectedOutput = {
+                article_id: 1,
+                title: 'Living in the shadow of a great man',
+                topic: 'mitch',
+                author: 'butter_bridge',
+                body: 'I find this existence challenging',
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 101
+            }
+            
             return request(app)
             .patch('/api/articles/1')
             .send({inc_votes: 1})
-            .set('Accept', 'application/json')
             .expect(200)
             .then(({body}) => {
-                expect(body.votes).toBe(101)
+                expect(body).toEqual(expectedOutput)
             })
         })
         test("STATUS: 200 - responds with the updated article, votes decreased when passed negative value", () => {
+            const expectedOutput = {
+                article_id: 1,
+                title: 'Living in the shadow of a great man',
+                topic: 'mitch',
+                author: 'butter_bridge',
+                body: 'I find this existence challenging',
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 99
+            }            
             return request(app)
             .patch('/api/articles/1')
-            .send({inc_votes: -1})
-            .set('Accept', 'application/json')
+            .send({inc_votes: -2})
             .expect(200)
             .then(({body}) => {
-                expect(body.votes).toBe(100)
+                expect(body).toEqual(expectedOutput)
             })
         })
         test("status: 400 - when not passed a inc_votes body", () => {
             return request(app)
             .patch('/api/articles/1')
             .send()
-            .set('Accept', 'application/json')
             .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toEqual("invalid data type")
+            })
         })
-        test("status: 404 - when passed an invalid inc_votes charactor", () => {
+        test("status: 400 - when passed an invalid inc_votes charactor", () => {
             return request(app)
             .patch('/api/articles/1')
             .send({inc_votes: "cat"})
-            .set('Accept', 'application/json')
             .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toEqual("invalid data type")
+            })
         })
         test("status: 404 - when passed an article_id that does not exist", () => {
             return request(app)
             .patch('/api/articles/100')
             .send({inc_votes: 1})
-            .set('Accept', 'application/json')
             .expect(404)
+            .then(({body}) => {
+                expect(body.msg).toEqual("Requested ID not found")
+            })
         })
     })
 })
