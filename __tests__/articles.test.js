@@ -144,6 +144,7 @@ describe("/api/articles/:article_id/comments", () => {
             const output = await request(app).get('/api/articles/1/comments')
             const comments = output.body.comments
             comments.forEach((comment) => {
+                expect(output.status).toBe(200)
                 expect(comment.hasOwnProperty("comment_id")).toBe(true)
                 expect(comment.hasOwnProperty("votes")).toBe(true)
                 expect(comment.hasOwnProperty("created_at")).toBe(true)

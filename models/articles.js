@@ -1,5 +1,5 @@
 const db = require("../db/connection")
-const { checkExists } = require("../utilitys/utils")
+const { checkExists } = require("../utilities/utils")
 
 exports.fetchArticle = ({article_id}) => {
     return db
