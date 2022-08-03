@@ -90,12 +90,12 @@ describe("/api/articles/:article_id", () => {
         test("status: 400 - when not passed a inc_votes body", async () => {
             const output = await request(app).patch('/api/articles/1').send()
             expect(output.status).toBe(400)
-            expect(output.body.msg).toEqual("invalid data type")
+            expect(output.body.msg).toEqual("Invalid Request")
         })
         test("status: 400 - when passed an invalid inc_votes charactor", async () => {
             const output = await request(app).patch('/api/articles/1').send({inc_votes: "cat"})
             expect(output.status).toBe(400)
-            expect(output.body.msg).toEqual("invalid data type")
+            expect(output.body.msg).toEqual("Invalid Request")
         })
         test("status: 404 - when passed an article_id that does not exist", async () => {
             const output = await request(app).patch('/api/articles/100').send({inc_votes: 1})
@@ -159,13 +159,59 @@ describe("/api/articles/:article_id/comments", () => {
         test("Status 400 - returns error when passed an ID that is not a number", async () => {
             const output = await request(app).get('/api/articles/banana/comments')
             expect(output.status).toBe(400)
-            expect(output.body.msg).toEqual("invalid data type")
+            expect(output.body.msg).toEqual("Invalid Request")
         })
         test("Status 404 - returns error when passed an ID that doesn't exist in the db", async () => {
             const output = await request(app).get('/api/articles/100/comments')
             expect(output.status).toBe(404)
-            expect(output.body.msg).toEqual("Requested ID not found")
+            expect(output.body.msg).toEqual("Requested article_id not found")
         })
     })
-    
+    describe("POST", () => {
+        test("STATUS 201 - Responds with the expected body & username in the response object", async () => {
+            const newComment = {username: "rogersop", body: "this is a test comment from Jest"}
+            const output = await request(app).post("/api/articles/2/comments").send(newComment)
+            const rtnComment = output.body.newComment
+            expect(output.status).toBe(201)
+            expect(rtnComment.author).toBe("rogersop")
+            expect(rtnComment.body).toBe("this is a test comment from Jest")            
+        })
+        test("STATUS 201 - Response object contains a comment_id & created_at property", async () => {
+            const newComment = {username: "rogersop", body: "this is another test comment would you belive it!"}
+            const output = await request(app).post("/api/articles/2/comments").send(newComment)
+            const rtnComment = output.body.newComment
+            expect(output.status).toBe(201)
+            expect(rtnComment.hasOwnProperty("comment_id")).toBe(true)
+            expect(rtnComment.hasOwnProperty("created_at")).toBe(true)
+            expect(rtnComment.body).toBe("this is another test comment would you belive it!") 
+        })
+        test("STATUS 200 - the two new comments exist in the DB and are linked to the correct article", async () => {
+            const output = await request(app).get("/api/articles/2")
+            expect(output.body.comment_count).toBe("2")
+        })
+        test("Status 400 - when the post request is missing a username", async () => {
+            const newComment = {body: "this comment is a fail!"}
+            const output = await request(app).post("/api/articles/2/comments").send(newComment)
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toBe("Invalid Request")
+        })
+        test("Status 400 - when the post request contains a username not currently in the DB", async () => {
+            const newComment = {username: "notAUser", body: "this comment is a fail!"}
+            const output = await request(app).post("/api/articles/2/comments").send(newComment)
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toBe("Invalid Request")
+        })
+        test("Status 400 - when the post request is missing a body/comment", async () => {
+            const newComment = {username: "rogersop"}
+            const output = await request(app).post("/api/articles/2/comments").send(newComment)
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toBe("Invalid Request")
+        })
+        test("Status 404 - when passed an article_id parameter that doesn't exist", async () => {
+            const newComment = {username: "rogersop"}
+            const output = await request(app).post("/api/articles/100/comments").send(newComment)
+            expect(output.status).toBe(404)
+            expect(output.body.msg).toBe("Requested article_id not found")
+        })
+    })
 })

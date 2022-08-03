@@ -49,3 +49,13 @@ exports.fetchComments = (id) => {
         return rows
     })
 }
+
+exports.addComment = async (id, newComment) => {
+    const {username, body} = newComment 
+    await checkExists('articles', 'article_id', id)
+    return db
+    .query(`
+    INSERT INTO comments (author, body, article_id)
+    VALUES ($1, $2, $3) RETURNING*;`, [username, body, id])
+    .then(({rows}) => rows[0])
+}
