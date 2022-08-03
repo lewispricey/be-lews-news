@@ -3,12 +3,8 @@ const app = require("../app.js");
 const seedDB = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
-
-// beforeAll(() => seedDB(data))
-// afterAll(() => db.end())
-
+ 
 exports.articleTest = describe("articlesTests", () => {
-    
     describe("/api/articles/:article_id", () => {
         describe("GET", () => {
             test("STATUS:200 returns an object", async () => {
@@ -216,5 +212,4 @@ exports.articleTest = describe("articlesTests", () => {
             })
         })
     })
-
 })

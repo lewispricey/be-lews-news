@@ -4,8 +4,6 @@ const seedDB = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
 
-// beforeAll(() => seedDB(data))
-// afterAll(() => db.end())
 exports.topicsTests = describe("topicTests", () => {
     describe("/api/topics", () => {
         describe("GET", () => {

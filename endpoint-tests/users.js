@@ -4,10 +4,6 @@ const seedDB = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
 
-// beforeAll(() => seedDB(data))
-// afterAll(() => db.end())
-
-
 exports.userTests = describe("/api/users", () => {
     describe("GET", () => {
         test("Status 200 - returns an array of objects with the required keys", async () => {
