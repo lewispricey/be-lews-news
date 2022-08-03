@@ -10,7 +10,7 @@ exports.fetchArticle = ({article_id}) => {
         WHERE articles.article_id=$1 GROUP BY articles.article_id;`, [article_id])
     .then(({rows}) => {
         if(rows.length === 0){
-            return Promise.reject({status: 404, msg: "Requested ID not found..."})
+            return Promise.reject({status: 404, msg: "Requested data not found"})
         }
         return rows[0]
     })
@@ -22,7 +22,7 @@ exports.updateArticle = ({article_id}, body) => {
     .then(({rows}) => {
         const article = rows[0]
         if(!article){
-            return Promise.reject({status: 404, msg: "Requested ID not found"})
+            return Promise.reject({status: 404, msg: "Requested data not found"})
         }
         return article
     })
@@ -52,7 +52,9 @@ exports.fetchComments = (id) => {
 
 exports.addComment = async (id, newComment) => {
     const {username, body} = newComment 
+    if(!username || !body) Promise.reject(next({status: 400, msg: "Invalid Request"}))
     await checkExists('articles', 'article_id', id)
+    await checkExists('users', 'username', username)
     return db
     .query(`
     INSERT INTO comments (author, body, article_id)

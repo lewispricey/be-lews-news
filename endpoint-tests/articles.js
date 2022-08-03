@@ -101,7 +101,7 @@ exports.articleTest = describe("articlesTests", () => {
             test("status: 404 - when passed an article_id that does not exist", async () => {
                 const output = await request(app).patch('/api/articles/100').send({inc_votes: 1})
                 expect(output.status).toBe(404)
-                expect(output.body.msg).toEqual("Requested ID not found")
+                expect(output.body.msg).toEqual("Requested data not found")
             })
         })
     })
@@ -165,7 +165,7 @@ exports.articleTest = describe("articlesTests", () => {
             test("Status 404 - returns error when passed an ID that doesn't exist in the db", async () => {
                 const output = await request(app).get('/api/articles/100/comments')
                 expect(output.status).toBe(404)
-                expect(output.body.msg).toEqual("Requested article_id not found")
+                expect(output.body.msg).toEqual("Requested data not found")
             })
         })
         describe("POST", () => {
@@ -196,11 +196,11 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.status).toBe(400)
                 expect(output.body.msg).toBe("Invalid Request")
             })
-            test("Status 400 - when the post request contains a username not currently in the DB", async () => {
+            test("Status 404 - when the post request contains a username not currently in the DB", async () => {
                 const newComment = {username: "notAUser", body: "this comment is a fail!"}
                 const output = await request(app).post("/api/articles/2/comments").send(newComment)
-                expect(output.status).toBe(400)
-                expect(output.body.msg).toBe("Invalid Request")
+                expect(output.status).toBe(404)
+                expect(output.body.msg).toBe("Requested data not found")
             })
             test("Status 400 - when the post request is missing a body/comment", async () => {
                 const newComment = {username: "rogersop"}
@@ -209,13 +209,12 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.body.msg).toBe("Invalid Request")
             })
             test("Status 404 - when passed an article_id parameter that doesn't exist", async () => {
-                const newComment = {username: "rogersop"}
+                const newComment = {username: "rogersop", body: "this comment is a fail!"}
                 const output = await request(app).post("/api/articles/100/comments").send(newComment)
                 expect(output.status).toBe(404)
-                expect(output.body.msg).toBe("Requested article_id not found")
+                expect(output.body.msg).toBe("Requested data not found")
             })
         })
     })
 
 })
-
