@@ -12,13 +12,13 @@ exports.patchArticle = (req, res, next) => {
     .then((updatedArticle) => res.status(200).send(updatedArticle))
     .catch((err) => next(err))
 }
-
+////////////////
 exports.getArticles = (req, res, next) => {
-    fetchArticles()
+    fetchArticles(req.query)
     .then((articles) => res.status(200).send({articles}))
     .catch((err) => next(err))
 }
-
+/////////
 exports.getComments = (req, res, next) => {
     const id = req.params.article_id
     fetchComments(id)
