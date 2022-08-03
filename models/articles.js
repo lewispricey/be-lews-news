@@ -1,5 +1,5 @@
-const e = require("express")
 const db = require("../db/connection")
+const { checkExists } = require("../utilities/utils")
 
 exports.fetchArticle = ({article_id}) => {
     return db
@@ -37,4 +37,15 @@ exports.fetchArticles = () => {
         GROUP BY articles.article_id 
         ORDER BY articles.created_at DESC;`)
     .then(({rows}) => rows)
+}
+
+exports.fetchComments = (id) => {
+    return db
+    .query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1;`, [id])
+    .then(async ({rows}) => {
+        if(rows.length === 0){
+            await checkExists('articles', 'article_id', id)
+        }
+        return rows
+    })
 }

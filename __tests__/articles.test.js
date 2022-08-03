@@ -132,3 +132,40 @@ describe("/api/articles", () => {
         })
     })
 })
+
+describe("/api/articles/:article_id/comments", () => {
+    describe("GET", () => {
+        test("Status 200 - returns the correct number of comment objects", async () => {
+            const output = await request(app).get('/api/articles/1/comments')
+            expect(output.status).toBe(200)
+            expect(output.body.comments.length).toBe(11)
+        })
+        test("Status 200 - returned comment objects contain the expected keys", async () => {
+            const output = await request(app).get('/api/articles/1/comments')
+            const comments = output.body.comments
+            comments.forEach((comment) => {
+                expect(output.status).toBe(200)
+                expect(comment.hasOwnProperty("comment_id")).toBe(true)
+                expect(comment.hasOwnProperty("votes")).toBe(true)
+                expect(comment.hasOwnProperty("created_at")).toBe(true)
+                expect(comment.hasOwnProperty("author")).toBe(true)
+                expect(comment.hasOwnProperty("body")).toBe(true)
+            })
+        })
+        test("Status 200 - returns an empty array when the article exists but there are no comments", async () => {
+            const output = await request(app).get('/api/articles/2/comments')
+            expect(output.body.comments).toEqual([])
+        })
+        test("Status 400 - returns error when passed an ID that is not a number", async () => {
+            const output = await request(app).get('/api/articles/banana/comments')
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toEqual("invalid data type")
+        })
+        test("Status 404 - returns error when passed an ID that doesn't exist in the db", async () => {
+            const output = await request(app).get('/api/articles/100/comments')
+            expect(output.status).toBe(404)
+            expect(output.body.msg).toEqual("Requested ID not found")
+        })
+    })
+    
+})
