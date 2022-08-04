@@ -5,6 +5,7 @@ const db = require("../db/connection");
 const { topicsTests } = require("../endpoint-tests/topics");
 const { userTests } = require("../endpoint-tests/users");
 const { commentsTests } = require("../endpoint-tests/comments");
+const { apiEndpoint } = require("../endpoint-tests/api");
 
 beforeAll(() => seedDB(data))
 afterAll(() => db.end())
@@ -12,3 +13,4 @@ articleTest
 topicsTests
 userTests
 commentsTests
+apiEndpoint
