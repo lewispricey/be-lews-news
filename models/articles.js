@@ -1,5 +1,5 @@
 const db = require("../db/connection")
-const { checkExists } = require("../utilities/utils")
+const { checkExists, makeQuery, checkUserRequest } = require("../utilities/utils")
 
 exports.fetchArticle = ({article_id}) => {
     return db
@@ -28,14 +28,18 @@ exports.updateArticle = ({article_id}, body) => {
     })
 }
 
-exports.fetchArticles = () => {
+exports.fetchArticles = async (usrQuerys) => {    
+    await checkUserRequest(usrQuerys)
+    const queryString = makeQuery(usrQuerys)
+    
+    if(usrQuerys.topic){
+        await checkExists('topics', 'slug', usrQuerys.topic)
+        return db
+        .query(queryString, [usrQuerys.topic])
+        .then(({rows}) => rows)
+    }
     return db
-    .query(`
-        SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
-        FROM articles 
-        LEFT OUTER JOIN comments ON articles.article_id = comments.article_id 
-        GROUP BY articles.article_id 
-        ORDER BY articles.created_at DESC;`)
+    .query(queryString)
     .then(({rows}) => rows)
 }
 

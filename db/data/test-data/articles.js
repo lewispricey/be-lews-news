@@ -1,7 +1,7 @@
 module.exports = [
   {
     title: "Living in the shadow of a great man",
-    topic: "mitch",
+    topic: "cats",
     author: "butter_bridge",
     body: "I find this existence challenging",
     created_at: 1594329060000,

@@ -5,7 +5,9 @@ const data = require("../db/data/test-data");
 const db = require("../db/connection");
  
 exports.articleTest = describe("articlesTests", () => {
+    
     describe("/api/articles/:article_id", () => {
+        
         describe("GET", () => {
             test("STATUS:200 returns an object", async () => {
                 const {body} = await request(app).get('/api/articles/1').expect(200)
@@ -25,7 +27,7 @@ exports.articleTest = describe("articlesTests", () => {
                 const expectedOutput = {
                     article_id: 1,
                     title: 'Living in the shadow of a great man',
-                    topic: 'mitch',
+                    topic: 'cats',
                     author: 'butter_bridge',
                     body: 'I find this existence challenging',
                     created_at: "2020-07-09T20:11:00.000Z",
@@ -54,12 +56,13 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.status).toBe(400)
             })
         })
+        
         describe("PATCH", () => {
             test("STATUS: 200 - responds with the updated article, votes increased when passed positive value", async () => {
                 const expectedOutput = {
                     article_id: 1,
                     title: 'Living in the shadow of a great man',
-                    topic: 'mitch',
+                    topic: 'cats',
                     author: 'butter_bridge',
                     body: 'I find this existence challenging',
                     created_at: "2020-07-09T20:11:00.000Z",
@@ -74,7 +77,7 @@ exports.articleTest = describe("articlesTests", () => {
                 const expectedOutput = {
                     article_id: 1,
                     title: 'Living in the shadow of a great man',
-                    topic: 'mitch',
+                    topic: 'cats',
                     author: 'butter_bridge',
                     body: 'I find this existence challenging',
                     created_at: "2020-07-09T20:11:00.000Z",
@@ -103,6 +106,7 @@ exports.articleTest = describe("articlesTests", () => {
     })
     
     describe("/api/articles", () => {
+        
         describe("GET", () => {
             test("Status 200 - returns the correct number of article objects", async () => {
                 const output = await request(app).get('/api/articles')
@@ -121,16 +125,53 @@ exports.articleTest = describe("articlesTests", () => {
                     expect(article.hasOwnProperty("comment_count")).toBe(true)
                 })
             })
-            test("Status 200 - return objects are sorted by newest date first", async () => {
+            test("Status 200 - return objects are sorted by newest date first when not passed a sort or order query", async () => {
                 const output = await request(app).get('/api/articles')
                 const rtnArticles = output.body.articles
                 const idOrder = rtnArticles.map((article) => article.article_id)
                 expect(idOrder).toEqual([3, 6,  2, 12, 5, 1, 9, 10, 4, 8, 11, 7])
             })
+            test("Status 200 - returns objects sorted oldest first when passed a order=asc query", async () => {
+                const output = await request(app).get('/api/articles?order=asc')
+                expect(output.status).toBe(200)
+                const rtnArticles = output.body.articles
+                const idOrder = rtnArticles.map((article) => article.article_id)
+                expect(idOrder).toEqual([7, 11, 8, 4, 10, 9, 1, 5, 12,  2, 6, 3])
+            })
+            test("Status 200 - returns objects sorted by the passed sort_by query", async () => {
+                const output = await request(app).get('/api/articles?sort_by=article_id')
+                expect(output.status).toBe(200)
+                const rtnArticles = output.body.articles
+                const idOrder = rtnArticles.map((article) => article.article_id)
+                expect(idOrder).toEqual([12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+            })
+            test("Status 200 - returns articles with the requested topic when passed topic as an optional query", async () =>{
+                const output = await request(app).get('/api/articles?topic=cats')
+                expect(output.status).toBe(200)
+                const rtnArticles = output.body.articles
+                const idOrder = rtnArticles.map((article) => article.article_id)
+                expect(idOrder).toEqual([5, 1])
+            })
+            test("Status 400 - returns error when passed an order that isnt asc or desc", async () =>{
+                const output = await request(app).get('/api/articles?order=steve')
+                expect(output.status).toBe(400)
+                expect(output.body.msg).toBe("Invalid Request")
+            })
+            test("Status 400 - returns error when passed a sort_by query thats column doesnt exist in the db", async () =>{
+                const output = await request(app).get('/api/articles?sort_by=phil')
+                expect(output.status).toBe(400)
+                expect(output.body.msg).toBe("Invalid Request")
+            })
+            test("Status 404 - returns error when passed a topic query that doesnt match any results", async () =>{
+                const output = await request(app).get('/api/articles?topic=david')
+                expect(output.status).toBe(404)
+                expect(output.body.msg).toBe("Requested data not found")
+            })
         })
     })
     
     describe("/api/articles/:article_id/comments", () => {
+        
         describe("GET", () => {
             test("Status 200 - returns the correct number of comment objects", async () => {
                 const output = await request(app).get('/api/articles/1/comments')
@@ -164,6 +205,7 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.body.msg).toEqual("Requested data not found")
             })
         })
+        
         describe("POST", () => {
             test("STATUS 201 - Responds with the expected body & username in the response object", async () => {
                 const newComment = {username: "rogersop", body: "this is a test comment from Jest"}

@@ -2,6 +2,7 @@ const express = require("express")
 const { getArticle, patchArticle, getArticles, getComments, postComment } = require("./controllers/articles")
 const { getTopics } = require("./controllers/topics")
 const { getUsers } = require("./controllers/users")
+const { customError, standardError } = require("./errors/error-handling")
 
 
 const app = express()
@@ -19,12 +20,7 @@ app.get('/api/users', getUsers)
 
 //////////////////////////////////////////
 
-app.use((err, req, res, next) => {
-    if(err.status) res.status(err.status).send({msg: err.msg})
-    next(err)
-})
-app.use((err, req, res, next) => {
-    res.status(400).send({msg: "Invalid Request"})
-})
+app.use(customError)
+app.use(standardError)
 
 module.exports = app

@@ -1,4 +1,4 @@
-const { fetchArticle, updateArticle, fetchArticles, fetchComments, validCheck, addComment } = require("../models/articles")
+const { fetchArticle, updateArticle, fetchArticles, fetchComments, addComment } = require("../models/articles")
 
 
 exports.getArticle = (req, res, next) => {
@@ -14,7 +14,7 @@ exports.patchArticle = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    fetchArticles()
+    fetchArticles(req.query)
     .then((articles) => res.status(200).send({articles}))
     .catch((err) => next(err))
 }
