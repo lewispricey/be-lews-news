@@ -1,5 +1,6 @@
 const express = require("express")
 const { getArticle, patchArticle, getArticles, getComments, postComment } = require("./controllers/articles")
+const { deleteComment } = require("./controllers/comments")
 const { getTopics } = require("./controllers/topics")
 const { getUsers } = require("./controllers/users")
 const { customError, standardError } = require("./errors/error-handling")
@@ -17,6 +18,8 @@ app.get('/api/articles/:article_id/comments', getComments)
 app.post('/api/articles/:article_id/comments', postComment)
 
 app.get('/api/users', getUsers)
+
+app.delete('/api/comments/:comment_id', deleteComment)
 
 //////////////////////////////////////////
 
