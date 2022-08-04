@@ -9,6 +9,18 @@ exports.checkExists = async (table, column, value) => {
     } 
 }
 
+exports.checkUserRequest = (querys) => {
+    const acceptedSorts = [undefined, "title", "topic", "author", "created_at", "votes", "article_id"]
+    if(!acceptedSorts.includes(querys.sort_by)){
+        return Promise.reject({status: 400, msg: "Invalid Request"})
+    }
+    const acceptedOrders = [undefined, "ASC", "asc", "desc", "DESC"]
+    if(!acceptedOrders.includes(querys.order)){
+        return Promise.reject({status: 400, msg: "Invalid Request"})
+    }
+}
+
+
 exports.makeQuery = (usrQuerys) => {
     if(!usrQuerys.order) usrQuerys.order = "DESC"
     // usrQuerys.order === "asc" || usrQuerys.order === "ASC" ? usrQuerys.order = "ASC" : usrQuerys.order = "DESC"

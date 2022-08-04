@@ -1,5 +1,5 @@
 const db = require("../db/connection")
-const { checkExists, makeQuery } = require("../utilities/utils")
+const { checkExists, makeQuery, checkUserRequest } = require("../utilities/utils")
 
 exports.fetchArticle = ({article_id}) => {
     return db
@@ -41,17 +41,6 @@ exports.fetchArticles = async (usrQuerys) => {
     return db
     .query(queryString)
     .then(({rows}) => rows)
-}
-
-const checkUserRequest = (querys) => {
-    const acceptedSorts = [undefined, "title", "topic", "author", "created_at", "votes", "article_id"]
-    if(!acceptedSorts.includes(querys.sort_by)){
-        return Promise.reject({status: 400, msg: "Invalid Request"})
-    }
-    const acceptedOrders = [undefined, "ASC", "asc", "desc", "DESC"]
-    if(!acceptedOrders.includes(querys.order)){
-        return Promise.reject({status: 400, msg: "Invalid Request"})
-    }
 }
 
 exports.fetchComments = (id) => {
