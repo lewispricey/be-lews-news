@@ -28,18 +28,30 @@ exports.updateArticle = ({article_id}, body) => {
     })
 }
 
-exports.fetchArticles = async (sortOrder) => {    
-    const queryString = makeQuery(sortOrder)
+exports.fetchArticles = async (usrQuerys) => {    
+    await checkUserRequest(usrQuerys)
+    const queryString = makeQuery(usrQuerys)
     
-    if(sortOrder.topic){
-        await checkExists('topics', 'slug', sortOrder.topic)
+    if(usrQuerys.topic){
+        await checkExists('topics', 'slug', usrQuerys.topic)
         return db
-        .query(queryString, [sortOrder.topic])
+        .query(queryString, [usrQuerys.topic])
         .then(({rows}) => rows)
     }
     return db
     .query(queryString)
     .then(({rows}) => rows)
+}
+
+const checkUserRequest = (querys) => {
+    const acceptedSorts = [undefined, "title", "topic", "author", "created_at", "votes", "article_id"]
+    if(!acceptedSorts.includes(querys.sort_by)){
+        return Promise.reject({status: 400, msg: "Invalid Request"})
+    }
+    const acceptedOrders = [undefined, "ASC", "asc", "desc", "DESC"]
+    if(!acceptedOrders.includes(querys.order)){
+        return Promise.reject({status: 400, msg: "Invalid Request"})
+    }
 }
 
 exports.fetchComments = (id) => {

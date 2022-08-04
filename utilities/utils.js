@@ -11,6 +11,7 @@ exports.checkExists = async (table, column, value) => {
 
 exports.makeQuery = (usrQuerys) => {
     if(!usrQuerys.order) usrQuerys.order = "DESC"
+    // usrQuerys.order === "asc" || usrQuerys.order === "ASC" ? usrQuerys.order = "ASC" : usrQuerys.order = "DESC"
     usrQuerys.sort_by ? usrQuerys.sort_by = "articles." + usrQuerys.sort_by : usrQuerys.sort_by = "articles.created_at";
             
     const qryStart = `
