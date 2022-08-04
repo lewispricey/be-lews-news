@@ -16,7 +16,7 @@ exports.commentsTests = describe("/api/comments/:comment_id", () => {
             expect(output.status).toBe(204)
             expect(output.body).toEqual({})
             const {body} = await request(app).get('/api/articles/3')
-            expect(body.comment_count).toBe("0")
+            expect(body.article.comment_count).toBe("0")
         })
         test("Status 404 - Returns error when requested ID is valid but does not exist in the DB", async () => {
             const output = await request(app).delete('/api/comments/1100')
@@ -27,6 +27,6 @@ exports.commentsTests = describe("/api/comments/:comment_id", () => {
             const output = await request(app).delete('/api/comments/banana')
             expect(output.status).toBe(400)
             expect(output.body.msg).toEqual("Invalid Request")
-        })    
+        })
     })
 })

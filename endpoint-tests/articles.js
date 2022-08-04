@@ -3,11 +3,11 @@ const app = require("../app.js");
 const seedDB = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const db = require("../db/connection");
- 
+
 exports.articleTest = describe("articlesTests", () => {
-    
+
     describe("/api/articles/:article_id", () => {
-        
+
         describe("GET", () => {
             test("STATUS:200 returns an object", async () => {
                 const {body} = await request(app).get('/api/articles/1').expect(200)
@@ -15,16 +15,16 @@ exports.articleTest = describe("articlesTests", () => {
             })
             test("STATUS:200 return object contains the required keys", async () => {
                 const {body} = await request(app).get('/api/articles/1').expect(200)
-                expect(body.hasOwnProperty("author")).toBe(true)
-                expect(body.hasOwnProperty("title")).toBe(true)
-                expect(body.hasOwnProperty("article_id")).toBe(true)
-                expect(body.hasOwnProperty("body")).toBe(true)
-                expect(body.hasOwnProperty("topic")).toBe(true)
-                expect(body.hasOwnProperty("votes")).toBe(true)
-                expect(body.hasOwnProperty("comment_count")).toBe(true)
+                expect(body.article.hasOwnProperty("author")).toBe(true)
+                expect(body.article.hasOwnProperty("title")).toBe(true)
+                expect(body.article.hasOwnProperty("article_id")).toBe(true)
+                expect(body.article.hasOwnProperty("body")).toBe(true)
+                expect(body.article.hasOwnProperty("topic")).toBe(true)
+                expect(body.article.hasOwnProperty("votes")).toBe(true)
+                expect(body.article.hasOwnProperty("comment_count")).toBe(true)
             })
             test("STATUS:200 returns the expected values when given 1 as the parameter", async () => {
-                const expectedOutput = {
+                const expectedOutput = {article: {
                     article_id: 1,
                     title: 'Living in the shadow of a great man',
                     topic: 'cats',
@@ -32,20 +32,20 @@ exports.articleTest = describe("articlesTests", () => {
                     body: 'I find this existence challenging',
                     created_at: "2020-07-09T20:11:00.000Z",
                     votes: 100
-                }
-                
+                }}
+
                 const {body} = await request(app).get('/api/articles/1')
-                expect(body.article_id).toEqual(expectedOutput.article_id)
-                expect(body.title).toEqual(expectedOutput.title)
-                expect(body.topic).toEqual(expectedOutput.topic)
-                expect(body.author).toEqual(expectedOutput.author)
-                expect(body.body).toEqual(expectedOutput.body)
-                expect(body.created_at).toEqual(expectedOutput.created_at)
-                expect(body.votes).toEqual(expectedOutput.votes)
+                expect(body.article.article_id).toEqual(expectedOutput.article.article_id)
+                expect(body.article.title).toEqual(expectedOutput.article.title)
+                expect(body.article.topic).toEqual(expectedOutput.article.topic)
+                expect(body.article.author).toEqual(expectedOutput.article.author)
+                expect(body.article.body).toEqual(expectedOutput.article.body)
+                expect(body.article.created_at).toEqual(expectedOutput.article.created_at)
+                expect(body.article.votes).toEqual(expectedOutput.article.votes)
             })
             test("STATUS:200 return the correct comment count", async () => {
                 const {body} = await request(app).get('/api/articles/1')
-                expect(body.comment_count).toBe("11")
+                expect(body.article.comment_count).toBe("11")
             })
             test("STATUS:404 when passed an articleID that does not exist in DB", async () => {
                 const output = await request(app).get('/api/articles/100')
@@ -56,7 +56,7 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.status).toBe(400)
             })
         })
-        
+
         describe("PATCH", () => {
             test("STATUS: 200 - responds with the updated article, votes increased when passed positive value", async () => {
                 const expectedOutput = {
@@ -68,7 +68,7 @@ exports.articleTest = describe("articlesTests", () => {
                     created_at: "2020-07-09T20:11:00.000Z",
                     votes: 101
                 }
-        
+
                 const output = await request(app).patch('/api/articles/1').send({inc_votes: 1})
                 expect(output.status).toBe(200)
                 expect(output.body).toEqual(expectedOutput)
@@ -82,7 +82,7 @@ exports.articleTest = describe("articlesTests", () => {
                     body: 'I find this existence challenging',
                     created_at: "2020-07-09T20:11:00.000Z",
                     votes: 99
-                }            
+                }
                 const output = await request(app).patch('/api/articles/1').send({inc_votes: -2})
                 expect(output.status).toBe(200)
                 expect(output.body).toEqual(expectedOutput)
@@ -104,9 +104,9 @@ exports.articleTest = describe("articlesTests", () => {
             })
         })
     })
-    
+
     describe("/api/articles", () => {
-        
+
         describe("GET", () => {
             test("Status 200 - returns the correct number of article objects", async () => {
                 const output = await request(app).get('/api/articles')
@@ -169,9 +169,9 @@ exports.articleTest = describe("articlesTests", () => {
             })
         })
     })
-    
+
     describe("/api/articles/:article_id/comments", () => {
-        
+
         describe("GET", () => {
             test("Status 200 - returns the correct number of comment objects", async () => {
                 const output = await request(app).get('/api/articles/1/comments')
@@ -205,7 +205,7 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.body.msg).toEqual("Requested data not found")
             })
         })
-        
+
         describe("POST", () => {
             test("STATUS 201 - Responds with the expected body & username in the response object", async () => {
                 const newComment = {username: "rogersop", body: "this is a test comment from Jest"}
@@ -213,7 +213,7 @@ exports.articleTest = describe("articlesTests", () => {
                 const rtnComment = output.body.newComment
                 expect(output.status).toBe(201)
                 expect(rtnComment.author).toBe("rogersop")
-                expect(rtnComment.body).toBe("this is a test comment from Jest")            
+                expect(rtnComment.body).toBe("this is a test comment from Jest")
             })
             test("STATUS 201 - Response object contains a comment_id & created_at property", async () => {
                 const newComment = {username: "rogersop", body: "this is another test comment would you belive it!"}
@@ -222,11 +222,11 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.status).toBe(201)
                 expect(rtnComment.hasOwnProperty("comment_id")).toBe(true)
                 expect(rtnComment.hasOwnProperty("created_at")).toBe(true)
-                expect(rtnComment.body).toBe("this is another test comment would you belive it!") 
+                expect(rtnComment.body).toBe("this is another test comment would you belive it!")
             })
             test("STATUS 200 - the two new comments exist in the DB and are linked to the correct article", async () => {
                 const output = await request(app).get("/api/articles/2")
-                expect(output.body.comment_count).toBe("2")
+                expect(output.body.article.comment_count).toBe("2")
             })
             test("Status 400 - when the post request is missing a username", async () => {
                 const newComment = {body: "this comment is a fail!"}

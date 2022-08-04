@@ -11,7 +11,7 @@
   },
   "GET /api/articles": {
     "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
@@ -23,5 +23,95 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id":{
+    "description": "returns an article whos article ID matches the requested parameter",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "cats",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 100,
+        "comment_count": "11"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id":{
+    "description": "returns the article object, with vote property increased when passed positive value and decreased when passed a negitive value",
+    "queries": ["inc_votes"],
+    "exampleResponse": {
+      "article": {
+      "article_id": 1,
+      "title": "Living in the shadow of a great man",
+      "topic": "cats",
+      "author": "butter_bridge",
+      "body": "I find this existence challenging",
+      "created_at": "2020-07-09T20:11:00.000Z",
+      "votes": 99
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments":{
+    "description": "returns an object containing an array of comment objects related to the requested ID",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 2,
+          "votes": 14,
+          "created_at": "2020-10-31T03:03:00.000Z",
+          "author": "butter_bridge",
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky."
+        },
+        {
+          "comment_id": 3,
+          "votes": 100,
+          "created_at": "2020-03-01T01:13:00.000Z",
+          "author": "icellusedkars",
+          "body": "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments":{
+    "description": "returns an object containing the newly added comment and adds this to the DB",
+    "queries": [],
+    "exampleResponse": {
+      "newComment":  {
+        "comment_id": 19,
+        "body": "this is a test comment from Jest",
+        "article_id": 2,
+        "author": "rogersop",
+        "votes": 0,
+        "created_at": "2022-08-04T15:02:04.056Z"
+      }
+    }
+  },
+  "GET /api/users" :{
+    "description": "returns an object containing an array of users",
+    "queries": [],
+    "exampleResponse": {
+      "newComment":  [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id" :{
+    "description": "Deletes the requested comment from the DB",
+    "queries": [],
+    "exampleResponse": {}
   }
 }
