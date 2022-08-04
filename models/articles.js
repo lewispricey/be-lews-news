@@ -27,15 +27,21 @@ exports.updateArticle = ({article_id}, body) => {
         return article
     })
 }
-/////////////
-exports.fetchArticles = (sortOrder) => {
+
+exports.fetchArticles = async (sortOrder) => {    
     const queryString = makeQuery(sortOrder)
-    console.log(queryString)
+    
+    if(sortOrder.topic){
+        await checkExists('topics', 'slug', sortOrder.topic)
+        return db
+        .query(queryString, [sortOrder.topic])
+        .then(({rows}) => rows)
+    }
     return db
     .query(queryString)
     .then(({rows}) => rows)
-    }
-///////////
+}
+
 exports.fetchComments = (id) => {
     return db
     .query(`SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = $1;`, [id])
@@ -58,13 +64,3 @@ exports.addComment = async (id, newComment) => {
     VALUES ($1, $2, $3) RETURNING*;`, [username, body, id])
     .then(({rows}) => rows[0])
 }
-
-
-//fetchArticles
-// .query(`
-// SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
-// FROM articles 
-// LEFT OUTER JOIN comments ON articles.article_id = comments.article_id 
-// GROUP BY articles.article_id 
-// ORDER BY articles.created_at DESC;`)
-// .then(({rows}) => rows)
