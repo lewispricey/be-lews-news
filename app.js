@@ -12,19 +12,18 @@ app.use(express.json())
 
 app.get('/api', getApi)
 
-app.get('/api/topics', getTopics) //done
+app.get('/api/topics', getTopics)
 
-app.get('/api/articles', getArticles) //done
-app.get('/api/articles/:article_id', getArticle) //done
-app.patch('/api/articles/:article_id', patchArticle) //done
-app.get('/api/articles/:article_id/comments', getComments) //done
-app.post('/api/articles/:article_id/comments', postComment) //done
+app.get('/api/articles', getArticles)
+app.get('/api/articles/:article_id', getArticle)
+app.patch('/api/articles/:article_id', patchArticle)
+app.get('/api/articles/:article_id/comments', getComments)
+app.post('/api/articles/:article_id/comments', postComment)
 
 app.get('/api/users', getUsers)
 
 app.delete('/api/comments/:comment_id', deleteComment)
 
-//////////////////////////////////////////
 
 app.use(customError)
 app.use(standardError)
