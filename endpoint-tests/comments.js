@@ -43,7 +43,7 @@ exports.commentsTests = describe("/api/comments/:comment_id", () => {
             const output = await request(app).patch('/api/comments/steve').send({"inc_votes": -1})
             expect(output.status).toBe(400)
             expect(output.body.msg).toBe("Invalid Request")
-        })//invalid body, id doesnt exist
+        })
         test("Status 400 - Returns invalid request when passed an invalid body", async () => {
             const output = await request(app).patch('/api/comments/1').send({"inc_votes": "phil"})
             expect(output.status).toBe(400)
