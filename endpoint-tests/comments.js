@@ -26,4 +26,35 @@ exports.commentsTests = describe("/api/comments/:comment_id", () => {
             expect(output.body.msg).toEqual("Invalid Request")
         })
     })
+    describe("PATCH", () => {
+        test("Status 200 - Returns the comment with the likes increased when passed a positive number", async () => {
+            const output = await request(app).patch('/api/comments/1').send({"inc_votes": 1})
+            expect(output.status).toBe(200)
+            expect(output.body.hasOwnProperty("comment")).toBe(true)
+            expect(output.body.comment.votes).toBe(17)
+        })
+        test("Status 200 - Returns the comment with the likes decreased when passsed a negitive number", async () => {
+            const output = await request(app).patch('/api/comments/1').send({"inc_votes": -1})
+            expect(output.status).toBe(200)
+            expect(output.body.hasOwnProperty("comment")).toBe(true)
+            expect(output.body.comment.votes).toBe(16)
+        })
+        test("Status 400 - Returns invalid request when passed an invalid comment id", async () => {
+            const output = await request(app).patch('/api/comments/steve').send({"inc_votes": -1})
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toBe("Invalid Request")
+        })//invalid body, id doesnt exist
+        test("Status 400 - Returns invalid request when passed an invalid body", async () => {
+            const output = await request(app).patch('/api/comments/1').send({"inc_votes": "phil"})
+            expect(output.status).toBe(400)
+            expect(output.body.msg).toBe("Invalid Request")
+        })
+        test("Status 404 - Returns not found when passed a comment ID that does not exist", async () => {
+            const output = await request(app).patch('/api/comments/1000').send({"inc_votes": 1})
+            expect(output.status).toBe(404)
+            expect(output.body.msg).toBe("Requested data not found")
+        })
+        
+    })
+    
 })
