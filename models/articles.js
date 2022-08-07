@@ -16,6 +16,22 @@ exports.fetchArticle = ({article_id}) => {
         return rows[0]
     })
 }
+
+exports.createArticle = (submittedArticle) => {
+    const {author, title, body, topic} = submittedArticle
+    return db
+    .query(`
+        INSERT INTO articles
+        (author, title, body, topic)
+        VALUES
+        ($1, $2, $3, $4) RETURNING*;`, [author, title, body, topic])
+    .then(({rows}) => {
+        rows[0].comment_count = 0
+        return rows[0]
+    })
+    console.log(author, title, body, topic)
+}
+
 exports.updateArticle = ({article_id}, body) => {
     return db
     .query('UPDATE articles SET votes=votes+$1 WHERE article_id=$2 RETURNING*;', [body.inc_votes, article_id])
