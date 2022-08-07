@@ -1,9 +1,15 @@
-const { fetchArticle, updateArticle, fetchArticles, fetchComments, addComment } = require("../models/articles")
+const { fetchArticle, updateArticle, fetchArticles, fetchComments, addComment, createArticle } = require("../models/articles")
 
 
 exports.getArticle = (req, res, next) => {
     fetchArticle(req.params)
     .then((article) => res.status(200).send({article}))
+    .catch((err) => next(err))
+}
+
+exports.postArticle = (req, res, next) => {
+    createArticle(req.body)
+    .then((newArticle) => res.status(201).send({article: newArticle}))
     .catch((err) => next(err))
 }
 

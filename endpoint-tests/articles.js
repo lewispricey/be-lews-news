@@ -165,6 +165,38 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(output.body.msg).toBe("Requested data not found")
             })
         })
+        describe("POST", () => {
+            test("Status 201 - returns the new article with all propertys from the db", async () => {
+                const newArticle = {
+                    "author": "lurker",
+                    "title": "The top 5 pokemon explained",
+                    "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them",
+                    "topic": "paper"
+                }   
+                const {status, body} = await request(app).post('/api/articles').send(newArticle)
+                expect(status).toBe(201)
+                expect(body.article.author).toBe("lurker")
+                expect(body.article.title).toBe(newArticle.title)
+                expect(body.article.body).toBe(newArticle.body)
+                expect(body.article.topic).toBe(newArticle.topic)
+                expect(body.article.hasOwnProperty("article_id")).toBe(true)
+                expect(body.article.hasOwnProperty("votes")).toBe(true)
+                expect(body.article.hasOwnProperty("created_at")).toBe(true)
+                expect(body.article.hasOwnProperty("comment_count")).toBe(true)
+            })
+            test("Status 400 - returns an error if any property is missing from the request", async () => {
+                const newArticle = {
+                    "author": "lurker",
+                    "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them",
+                    "topic": "paper"
+                }   
+                const {status, body} = await request(app).post('/api/articles').send(newArticle)
+                expect(status).toBe(400)
+                expect(body).toEqual({msg:"Invalid Request"})
+                
+            })
+
+        })
     })
 
     describe("/api/articles/:article_id/comments", () => {
