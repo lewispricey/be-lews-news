@@ -24,3 +24,13 @@ exports.fetchUser = (username) => {
         return rows[0]
     })
 }
+
+exports.updateUserPic = (username, {avatar_url}) => {
+    return db
+    .query(`
+    UPDATE users 
+    SET avatar_url = $1 
+    WHERE username = $2 
+    RETURNING*;`, [avatar_url, username])
+    .then(({rows}) => rows[0])
+}
