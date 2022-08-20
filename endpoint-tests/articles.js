@@ -1,4 +1,5 @@
 const request = require("supertest");
+const { response } = require("../app.js");
 const app = require("../app.js");
 
 exports.articleTest = describe("articlesTests", () => {
@@ -108,7 +109,7 @@ exports.articleTest = describe("articlesTests", () => {
             test("Status 200 - returns the correct number of article objects", async () => {
                 const output = await request(app).get('/api/articles')
                 expect(output.status).toBe(200)
-                expect(output.body.articles.length).toBe(12)
+                expect(output.body.articles.length).toBe(10)
             })
             test("Status 200 - return objects contain the expected propertys", async () => {
                 const output = await request(app).get('/api/articles')
@@ -126,21 +127,21 @@ exports.articleTest = describe("articlesTests", () => {
                 const output = await request(app).get('/api/articles')
                 const rtnArticles = output.body.articles
                 const idOrder = rtnArticles.map((article) => article.article_id)
-                expect(idOrder).toEqual([3, 6,  2, 12, 5, 1, 9, 10, 4, 8, 11, 7])
+                expect(idOrder).toEqual([3, 6,  2, 12, 5, 1, 9, 10, 4, 8])
             })
             test("Status 200 - returns objects sorted oldest first when passed a order=asc query", async () => {
                 const output = await request(app).get('/api/articles?order=asc')
                 expect(output.status).toBe(200)
                 const rtnArticles = output.body.articles
                 const idOrder = rtnArticles.map((article) => article.article_id)
-                expect(idOrder).toEqual([7, 11, 8, 4, 10, 9, 1, 5, 12,  2, 6, 3])
+                expect(idOrder).toEqual([7, 11, 8, 4, 10, 9, 1, 5, 12,  2])
             })
             test("Status 200 - returns objects sorted by the passed sort_by query", async () => {
                 const output = await request(app).get('/api/articles?sort_by=article_id')
                 expect(output.status).toBe(200)
                 const rtnArticles = output.body.articles
                 const idOrder = rtnArticles.map((article) => article.article_id)
-                expect(idOrder).toEqual([12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
+                expect(idOrder).toEqual([12, 11, 10, 9, 8, 7, 6, 5, 4, 3])
             })
             test("Status 200 - returns articles with the requested topic when passed topic as an optional query", async () =>{
                 const output = await request(app).get('/api/articles?topic=cats')
@@ -149,6 +150,31 @@ exports.articleTest = describe("articlesTests", () => {
                 const idOrder = rtnArticles.map((article) => article.article_id)
                 expect(idOrder).toEqual([5, 1])
             })
+            /////////////////////////////////// 10
+            test("Status 200 - Returns 10 articles when not passed a limit query", async () => {
+                const {status, body} = await request(app).get('/api/articles')
+                expect(status).toBe(200)
+                expect(body.articles.length).toBe(10)
+            })
+            test("Status 200 - Returns the correct number of articles when passed a limit query", async () => {
+                const lengths = [1, 3, 5, 7, 9, 12]
+                lengths.forEach(async (length) => {
+                    const {status, body} = await request(app).get(`/api/articles?limit=${length}`)
+                    expect(status).toBe(200)
+                    expect(body.articles.length).toBe(length)
+                })
+            })
+            test("Status 200 - Returns as many articles as possible that match the query when passed more articles than exist", async () => {
+                const {status, body} = await request(app).get(`/api/articles?limit=70`)
+                expect(status).toBe(200)
+                expect(body.articles.length).toBe(12)
+            })
+            test("Status 400 - Returns an error when passed an invalid limit request", async () => {
+                const {status, body} = await request(app).get('/api/articles?limit=bob')
+                expect(status).toBe(400)
+                expect(body.msg).toBe("Invalid Request")
+            })
+            /////////////////////////////////////
             test("Status 400 - returns error when passed an order that isnt asc or desc", async () =>{
                 const output = await request(app).get('/api/articles?order=steve')
                 expect(output.status).toBe(400)
@@ -172,7 +198,10 @@ exports.articleTest = describe("articlesTests", () => {
                     "title": "The top 5 pokemon explained",
                     "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them",
                     "topic": "paper"
-                }   
+                }  
+                
+                
+                
                 const {status, body} = await request(app).post('/api/articles').send(newArticle)
                 expect(status).toBe(201)
                 expect(body.article.author).toBe("lurker")
@@ -185,17 +214,52 @@ exports.articleTest = describe("articlesTests", () => {
                 expect(body.article.hasOwnProperty("comment_count")).toBe(true)
             })
             test("Status 400 - returns an error if any property is missing from the request", async () => {
-                const newArticle = {
+                const newArticles = [{
+                    "title": "The top 5 pokemon explained",
+                    "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them",
+                    "topic": "paper"
+                    }, 
+                    {
                     "author": "lurker",
                     "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them",
                     "topic": "paper"
-                }   
-                const {status, body} = await request(app).post('/api/articles').send(newArticle)
-                expect(status).toBe(400)
-                expect(body).toEqual({msg:"Invalid Request"})
-                
+                    }, 
+                    {
+                    "author": "lurker",
+                    "title": "The top 5 pokemon explained",
+                    "topic": "paper"
+                    },
+                    {
+                    "author": "lurker",
+                    "title": "The top 5 pokemon explained",
+                    "body": "This is content about the top 5 pokemon ever to exist! Yep thats right a whole artile on them"
+                    }
+                    ]
+                newArticles.forEach(async (article) => {
+                    const {status, body} = await request(app).post('/api/articles').send(article)
+                    expect(status).toBe(400)
+                    expect(body).toEqual({msg:"Invalid Request"})
+                })
             })
+        })
+        describe("DELETE", () => {
+            test("Status 204 - Responds with 204 no content", async () => {
+                const output = await request(app).delete('/api/articles/4')
+                expect(output.status).toBe(204)
 
+                const {status, body} = await request(app).get('/api/articles/4')
+                expect(status).toBe(404)
+            })
+            test("Status 400 - when passed an invalid article id", async () => {
+                const {status, body} = await request(app).delete('/api/articles/hello')
+                expect(status).toBe(400)
+                expect(body).toEqual({"msg": "Invalid Request"})
+            })
+            test("Status 404 - when passed a valid article ID that does not exist", async () => {
+                const {status, body} = await request(app).delete('/api/articles/5000')
+                expect(status).toBe(404)
+                expect(body).toEqual({"msg": "Requested data not found"})
+            })
         })
     })
 
