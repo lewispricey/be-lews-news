@@ -4,6 +4,16 @@ exports.fetchUsers = () => {
     return db.query('SELECT * FROM users;').then(({rows}) => rows)
 }
 
+exports.addUser = ({username, avatar_url, name}) => {
+    return db
+    .query(`
+        INSERT INTO users
+        (username, name, avatar_url)
+        VALUES
+        ($1, $2, $3) RETURNING*;`, [username, name, avatar_url])
+    .then(({rows}) => rows[0])
+}
+
 exports.fetchUser = (username) => {
     return db
     .query('SELECT username, avatar_url, name FROM users WHERE username = $1;', [username])

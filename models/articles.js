@@ -29,7 +29,6 @@ exports.createArticle = (submittedArticle) => {
         rows[0].comment_count = 0
         return rows[0]
     })
-    console.log(author, title, body, topic)
 }
 
 exports.updateArticle = ({article_id}, body) => {
@@ -45,17 +44,17 @@ exports.updateArticle = ({article_id}, body) => {
 }
 
 exports.fetchArticles = async (usrQuerys) => {    
+    usrQuerys.limit === undefined ? usrQuerys.limit = 10 : usrQuerys.limit
     await checkUserRequest(usrQuerys)
     const queryString = makeQuery(usrQuerys)
-    
     if(usrQuerys.topic){
         await checkExists('topics', 'slug', usrQuerys.topic)
         return db
-        .query(queryString, [usrQuerys.topic])
+        .query(queryString, [usrQuerys.limit, usrQuerys.topic])
         .then(({rows}) => rows)
     }
     return db
-    .query(queryString)
+    .query(queryString, [usrQuerys.limit])
     .then(({rows}) => rows)
 }
 
@@ -80,4 +79,16 @@ exports.addComment = async (id, newComment) => {
     INSERT INTO comments (author, body, article_id)
     VALUES ($1, $2, $3) RETURNING*;`, [username, body, id])
     .then(({rows}) => rows[0])
+}
+
+exports.removeArticle = (id) => {
+    return db
+    .query(`
+    DELETE FROM articles
+    WHERE article_id = $1
+    RETURNING*;`, [id])
+    .then(({rows}) => {
+        if(rows.length === 0) return Promise.reject({status: "404", msg: "Requested data not found"})
+        return rows[0]
+    })
 }

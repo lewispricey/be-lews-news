@@ -1,4 +1,5 @@
 const format = require("pg-format")
+const { query } = require("../db/connection")
 const db = require("../db/connection")
 
 exports.checkExists = async (table, column, value) => {
@@ -29,10 +30,11 @@ exports.makeQuery = (usrQuerys) => {
     const qryStart = `
     SELECT articles.article_id, title, topic, articles.author, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count FROM articles 
     LEFT OUTER JOIN comments ON articles.article_id = comments.article_id`
-    const where =`WHERE articles.topic = $1`
+    const where =`WHERE articles.topic = $2`
     const qryEnd = `
     GROUP BY articles.article_id 
-    ORDER BY %s %s;`    
+    ORDER BY %s %s
+    LIMIT $1;`    
 
     if(usrQuerys.topic){
         const queryString = format(`${qryStart} ${where} ${qryEnd}`, usrQuerys.sort_by, usrQuerys.order.toUpperCase())
