@@ -86,5 +86,27 @@ exports.userTests = describe("userTests", () => {
                 expect(output.body.msg).toBe("Requested data not found")
             })
         })
+        describe("PATCH", () => {
+            test("Status 200 - returns a user object", async () => {
+                const userUpdate = {avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                const {status, body} = await request(app).patch("/api/users/icellusedkars").send(userUpdate)
+                expect(status).toBe(200)
+                expect(body.user.hasOwnProperty("username")).toBe(true)
+                expect(body.user.hasOwnProperty("name")).toBe(true)
+                expect(body.user.hasOwnProperty("avatar_url")).toBe(true)
+            })
+            test("Status 200 - item is updated in the db", async () => {
+                const userUpdate = {avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                const {status, body} = await request(app).patch("/api/users/rogersop").send(userUpdate)
+                expect(status).toBe(200)
+                expect(body.user.avatar_url).toBe("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png")
+            })
+            test("Status 400 - when passed a body with no avatar_url", async () => {
+                const userUpdate = {}
+                const {status, body} = await request(app).patch("/api/users/icellusedkars").send(userUpdate)
+                expect(status).toBe(400)
+                expect(body).toEqual({msg:"Invalid Request"})
+            })
+        })
     })
 })
