@@ -18,6 +18,49 @@ exports.userTests = describe("userTests", () => {
                 expect(body.users.length).toBe(4)
             })
         })
+        describe("POST", () => {
+            test("Status 201 - responds with created", async () => {
+                const newUser = {username: "test username", avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png", name:"test name"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(201)
+                expect(body.user.hasOwnProperty("username")).toBe(true)
+                expect(body.user.hasOwnProperty("avatar_url")).toBe(true)
+                expect(body.user.hasOwnProperty("name")).toBe(true)
+            })
+            test("Status 201 - New user is added to the db", async () => {
+                const newUser = {username: "lewisp", avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png", name:"lewis"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(201)
+
+                const output = await request(app).get('/api/users/lewisp')
+                expect(output.status).toBe(200)
+                expect(output.body.user.name).toBe("lewis")
+            })
+            test("Status 400 - error when post request is missing a username property", async () => {
+                const newUser = {avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png", name:"lewis"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(400)
+                expect(body.msg).toBe("Invalid Request")
+            })
+            test("Status 400 - error when post request is missing a avatar_url property", async () => {
+                const newUser = {username: "steve", name:"lewis"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(400)
+                expect(body.msg).toBe("Invalid Request")
+            })
+            test("Status 400 - error when post request is missing a name property", async () => {
+                const newUser = {username: "steve", avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(400)
+                expect(body.msg).toBe("Invalid Request")
+            })
+            test("Status 400 - when the username already exists in the db", async () => {
+                const newUser = {username: "lewisp", avatar_url: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png", name:"lewis"}
+                const {status, body} = await request(app).post("/api/users").send(newUser)
+                expect(status).toBe(400)
+                expect(body.msg).toBe("Invalid Request")
+            })
+        })
     })
     
     describe("/api/users/:username", () => {

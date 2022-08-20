@@ -20,9 +20,9 @@ const seed = async ({ topicData, userData, articleData, commentData }) => {
 
   const usersTablePromise = db.query(`
   CREATE TABLE users (
-    username VARCHAR PRIMARY KEY,
+    username VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR NOT NULL,
-    avatar_url VARCHAR
+    avatar_url VARCHAR NOT NULL
   );`);
 
   await Promise.all([topicsTablePromise, usersTablePromise]);
@@ -42,7 +42,7 @@ const seed = async ({ topicData, userData, articleData, commentData }) => {
   CREATE TABLE comments (
     comment_id SERIAL PRIMARY KEY,
     body VARCHAR NOT NULL,
-    article_id INT REFERENCES articles(article_id) NOT NULL,
+    article_id INT REFERENCES articles(article_id) ON delete cascade,
     author VARCHAR REFERENCES users(username) NOT NULL,
     votes INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()

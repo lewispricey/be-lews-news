@@ -1,4 +1,4 @@
-const { fetchArticle, updateArticle, fetchArticles, fetchComments, addComment, createArticle } = require("../models/articles")
+const { fetchArticle, updateArticle, fetchArticles, fetchComments, addComment, createArticle, removeArticle } = require("../models/articles")
 
 
 exports.getArticle = (req, res, next) => {
@@ -37,5 +37,11 @@ exports.postComment = (req, res, next) => {
     const newComment = req.body
     addComment(id, newComment)
     .then((comment) => res.status(201).send({"newComment": comment}))
+    .catch((err) => next(err))
+}
+
+exports.deleteArticle = (req, res, next) => {
+    const id = req.params.article_id
+    removeArticle(id).then((data) => res.status(204).send({"test": data}))
     .catch((err) => next(err))
 }
