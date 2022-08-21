@@ -347,4 +347,29 @@ exports.articleTest = describe("articlesTests", () => {
             })
         })
     })
+
+    describe("/api/articles/search/:searchterm", () => {
+        describe("GET", () => {
+            test("Status 200 - returns an object", async () => {
+                const {status, body} = await request(app).get("/api/articles/search/cat")
+                expect(status).toBe(200)
+                expect(typeof body).toBe("object")
+            })
+            test("Status 200 - returns an array of articles matching the search term on the key of articles", async () => {
+                const {status, body} = await request(app).get("/api/articles/search/cat")
+                const article = body.articles[0]
+                expect(status).toBe(200)
+                expect(article.hasOwnProperty("article_id")).toBe(true)
+                expect(article.hasOwnProperty("title")).toBe(true)
+                expect(article.hasOwnProperty("topic")).toBe(true)
+                expect(article.hasOwnProperty("body")).toBe(true)
+                expect(article.hasOwnProperty("created_at")).toBe(true)
+                expect(article.hasOwnProperty("votes")).toBe(true)
+            })
+            test("Status 404 - when passed a search term that does not appear in the db", async () => {
+                const {status} = await request(app).get("/api/articles/search/hfeuishfiueshfawomiuphiufwa")
+                expect(status).toBe(404)
+            })
+        })
+    })
 })
