@@ -101,7 +101,6 @@ exports.fetchArticlesBySearch = (searchTerm) => {
     FROM articles 
     WHERE body ILIKE $1;`, [formattedSearchTerm])
     .then(({rows}) => {
-        console.log(rows)
         if(rows.length === 0) return Promise.reject({status: "404", msg: "No Content"})
         return rows
     })
